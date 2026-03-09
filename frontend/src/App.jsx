@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useConversation } from '@elevenlabs/react';
 
 const AUTH_TOKEN_KEY = 'shumail_auth_token';
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 const App = () => {
   const [authToken, setAuthToken] = useState(() => localStorage.getItem(AUTH_TOKEN_KEY));
@@ -47,7 +48,7 @@ const App = () => {
     setConfigError('');
     setConfigLoading(true);
     const headers = { Authorization: `Bearer ${authToken}` };
-    fetch('/api/config', { headers })
+    fetch(`${API_BASE}/api/config`, { headers })
       .then((res) => {
         if (res.status === 401) {
           localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -91,7 +92,7 @@ const App = () => {
         setWindowHint('connecting...');
         await navigator.mediaDevices.getUserMedia({ audio: true });
         const headers = { Authorization: `Bearer ${authToken}` };
-        const res = await fetch('/api/convai/signed-url', { headers });
+        const res = await fetch(`${API_BASE}/api/convai/signed-url`, { headers });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.detail || 'Could not get connection');
@@ -122,7 +123,7 @@ const App = () => {
     setAuthError('');
     setAuthLoading(true);
     try {
-      const res = await fetch('/api/auth/request-otp', {
+      const res = await fetch(`${API_BASE}/api/auth/request-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -151,7 +152,7 @@ const App = () => {
     setAuthError('');
     setAuthLoading(true);
     try {
-      const res = await fetch('/api/auth/verify-otp', {
+      const res = await fetch(`${API_BASE}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: authEmail, otp }),
